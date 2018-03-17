@@ -4,23 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.matheus.speechrecognizersample.Sample"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.example.matheus.speechrecognizersample.Sample">
 
     <Button
+        android:id="@+id/record_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/record_btn"
-        android:layout_marginTop="60dp"
         android:layout_gravity="center"
-        android:text="Start listening"
-        />
+        android:layout_marginTop="60dp"
+        android:text="Start listening" />
 
     <TextView
+        android:id="@+id/speech_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/speech_result"
+        android:layout_gravity="center"
         android:layout_marginTop="60dp"
-        android:layout_gravity="center"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <EditText
+        android:id="@+id/server_ip_textbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:hint="server address"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/responseView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="60dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
 </LinearLayout>

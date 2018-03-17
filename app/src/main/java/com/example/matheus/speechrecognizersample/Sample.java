@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedInputStream;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -28,6 +30,9 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
 
     Button record_btn;
     TextView speech_result;
+    TextView responseView;
+    EditText server_ip_textbox;
+    String server_ip;
 
     private SpeechRecognizer speechRecognizer;
     private Intent recognizerIntent;
@@ -39,6 +44,8 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
 
         record_btn = findViewById(R.id.record_btn);
         speech_result = findViewById(R.id.speech_result);
+        responseView = findViewById(R.id.responseView);
+        server_ip_textbox = findViewById(R.id.server_ip_textbox);
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(Sample.this);
         speechRecognizer.setRecognitionListener(Sample.this);
@@ -57,11 +64,20 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
         record_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String ip = server_ip_textbox.getText().toString();
+                server_ip_textbox.setEnabled(false);
+                server_ip = validate(ip) ? ip : "192.168.10.23";
+                server_ip_textbox.setText(server_ip);
                 listen();
             }
         });
     }
 
+    private static final Pattern PATTERN = Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+
+    public static boolean validate(final String ip) {
+        return PATTERN.matcher(ip).matches();
+    }
 
     @NeedsPermission(value = {Manifest.permission.RECORD_AUDIO})
     public void listen() {
@@ -104,8 +120,9 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
         ArrayList<String> strList = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         String data = strList.get(0);
         String cmd = data.replaceAll(" ", "_");
-        speech_result.setText(cmd);
         sendCommandToServer(cmd);
+        cmd = "sending to server:\n" + cmd;
+        speech_result.setText(cmd);
     }
 
     @Override
@@ -119,8 +136,13 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
     }
 
     public void sendCommandToServer(String cmd) {
-        String url = "http://172.20.10.5:3000/doCommand/" + cmd;
-        new GET().execute(url);
+        String url = "http://" + server_ip + ":3000/doCommand/" + cmd;
+        try {
+            String res = new GET().execute(url).get();
+            responseView.setText(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     class GET extends AsyncTask<String, Integer, String> {
@@ -130,10 +152,9 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
                 URL url = new URL(urls[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                result = readStream(in);
+                result = "received from server:\n" + readStream(in);
                 in.close();
                 urlConnection.disconnect();
-                speech_result.setText(result);
             } catch (Exception e) {
                 e.printStackTrace();
             }
