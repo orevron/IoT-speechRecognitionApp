@@ -55,6 +55,7 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, Sample.this.getPackageName()); // Replace by your package.
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en_US");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "he_IL");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 10);
@@ -64,10 +65,6 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
         record_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String ip = server_ip_textbox.getText().toString();
-                server_ip_textbox.setEnabled(false);
-                server_ip = validate(ip) ? ip : "192.168.10.23";
-                server_ip_textbox.setText(server_ip);
                 listen();
             }
         });
@@ -87,7 +84,10 @@ public class Sample extends AppCompatActivity implements RecognitionListener {
 
     @Override
     public void onReadyForSpeech(Bundle bundle) {
-
+        String ip = server_ip_textbox.getText().toString();
+        server_ip_textbox.setEnabled(false);
+        server_ip = validate(ip) ? ip : "192.168.10.23";
+        server_ip_textbox.setText(server_ip);
     }
 
     @Override
